@@ -26,5 +26,75 @@
     "title": "ml_website",
     "section": "",
     "text": "No matching items"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html",
+    "href": "posts/overview-analysis/index.html",
+    "title": "Overview Analysis",
+    "section": "",
+    "text": "** Data Source: gmv_nmv\n\n\n\nNumber of active sellers and creators\n\n\nfirst_month\nlast_month\nno_months\ntotal_gmv\ntotal_est_gmv\ntotal_nmv\nno_sellers\nno_creators\nnmv_over_gmv\n\n\n\n\n2023-07-01\n2023-12-01\n6\n379,685\n433,021\n201,115\n3,011\n368\n53.0%\n\n\n\n\n\n\nAverage active sellers and creators per month\n\n\navg_monthly_seller\navg_monthly_creators\navg_monthly_gmv\navg_monthly_est_gmv\navg_monthly_nmv\n\n\n\n\n1,440\n240\n63,281\n72,170\n33,519"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#monthly-revenue",
+    "href": "posts/overview-analysis/index.html#monthly-revenue",
+    "title": "Overview Analysis",
+    "section": "3.1 Monthly Revenue",
+    "text": "3.1 Monthly Revenue\n\n3.1.1 Total\n\n\n\nCompound Monthly Growth Rate\n\n\ngmv_cmgr\nest_gmv_cmgr\nnmv_cmgr\n\n\n\n\n23.8%\n23.3%\n17.1%\n\n\n\n\n\n\nSales Through Time\n\n\nmetric\n2023-07\n2023-08\n2023-09\n2023-10\n2023-11\n2023-12\n\n\n\n\ngmv\n40,595\n69,173\n61,269\n63,107\n27,554\n117,987\n\n\nest_gmv\n41,494\n69,287\n61,365\n63,234\n79,486\n118,156\n\n\nnmv\n24,562\n26,808\n27,080\n28,879\n39,691\n54,096\n\n\n\n\n\n\n\n\n\n\n\n\n3.1.2 GMV, NMV in November\n\nTo be checked: Why was there this huge gap?\n\n\n\n\nSales Through Time\n\n\ncreator\nseller\ngmv\nest_gmv\nnmv\n\n\n\n\nsolsolunnie2\nsolsol unnie\n1,093\n3,976\n2,599\n\n\nlamatuyen\nLâm A Tuyến\n628\n2,848\n1,861\n\n\nlinhan.1998\nSneaker Buzz\n0\n1,757\n1,149\n\n\nrinprinday\nwhose.stu\n38\n1,359\n888\n\n\nvuduy2412\nLONKOOMPARFUM\n0\n1,207\n789\n\n\nbigsizenam\nMậu Vân Shop\n130\n1,149\n751\n\n\nvanhlamdep\nHella Beauty Vietnam\n100\n1,015\n664\n\n\nlinhan.1998\nDirty Coins\n6\n992\n648\n\n\ntphat2105\nOutlayer\n280\n924\n604\n\n\nthuykieu0207\nNgoc Trinh NTB - GDKD ThuyKieu\n71\n909\n594"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#monthly-seller",
+    "href": "posts/overview-analysis/index.html#monthly-seller",
+    "title": "Overview Analysis",
+    "section": "3.2 Monthly Seller",
+    "text": "3.2 Monthly Seller\n\n\n\nCompound Monthly Growth Rate\n\n\nCMGR\n\n\n\n\n8.4%\n\n\n\n\n\n\nNumber Of Sellers Through Time\n\n\n2023-07\n2023-08\n2023-09\n2023-10\n2023-11\n2023-12\n\n\n\n\n1,153\n1,368\n1,388\n1,485\n1,522\n1,726"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#monthly-creator",
+    "href": "posts/overview-analysis/index.html#monthly-creator",
+    "title": "Overview Analysis",
+    "section": "3.3 Monthly Creator",
+    "text": "3.3 Monthly Creator\n\n\n\nCompound Monthly Growth Rate\n\n\nCMGR\n\n\n\n\n3.7%\n\n\n\n\n\n\nNumber Of Creators Through Time\n\n\n2023-07\n2023-08\n2023-09\n2023-10\n2023-11\n2023-12\n\n\n\n\n216\n226\n232\n260\n248\n259"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#compare-with-gmv_nmv-source",
+    "href": "posts/overview-analysis/index.html#compare-with-gmv_nmv-source",
+    "title": "Overview Analysis",
+    "section": "4.1 Compare With GMV_NMV Source",
+    "text": "4.1 Compare With GMV_NMV Source\n\n\n\nSummary Paid And Unpaid Sales Order\n\n\nfirst_month\nlast_month\nno_months\ntotal_gmv\ntotal_nmv\nno_sellers\nno_creators\nnmv_over_gmv\n\n\n\n\n07-2023\n12-2023\n6\n268,604\n223,194\n2,603\n332\n83.1%\n\n\n\n\n\n\nCompare GMV/NMV Gap 2 Sources\n\n\nsource\nfirst_month\nlast_month\nno_months\ntotal_gmv\ntotal_nmv\nno_sellers\nno_creators\nnmv_over_gmv\ngap_gmv\ngap_nmv\ngap_sellers\ngap_creators\n\n\n\n\ngmv_nmv\n07-2023\n12-2023\n6\n379,685\n201,115\n3,011\n368\n53.0%\nNA\nNA\nNA\nNA\n\n\npaid_unpaid_sales_order\n07-2023\n12-2023\n6\n268,604\n223,194\n2,603\n332\n83.1%\n-29.3%\n11.0%\n-13.6%\n-9.8%"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#total-1",
+    "href": "posts/overview-analysis/index.html#total-1",
+    "title": "Overview Analysis",
+    "section": "4.2 Total",
+    "text": "4.2 Total\n\n\n\nSales Order Summary P1\n\n\ntotal_gmv\ntotal_nmv\nqty_sold\nno_gmv_orders\nno_nmv_orders\ncommission\nmelive_commission\ncreator_commission\nno_livestreams\nno_products\n\n\n\n\n268,604\n223,194\n1,372,617\n1,228,710\n1,030,640\n21,902\n5,955\n15,947\n19,065\n19,334\n\n\n\n\n\n\nSales Order Summary P2\n\n\naov_gmv\naov_nmv\nasp\ncommission_rate\nmelive_takerate\nml_com_over_gmv\ncommission_per_livestream\ngmv_per_livestream\n\n\n\n\n218,607\n216,559\n195,688\n9.8%\n27.2%\n2.2%\n1\n14"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#monthly",
+    "href": "posts/overview-analysis/index.html#monthly",
+    "title": "Overview Analysis",
+    "section": "4.3 Monthly",
+    "text": "4.3 Monthly\n\n\n\nSales Order Summary P1\n\n\nmonth\ntotal_gmv\ntotal_nmv\nqty_sold\nno_gmv_orders\nno_nmv_orders\ncommission\nmelive_commission\ncreator_commission\nno_livestreams\nno_products\n\n\n\n\n07-2023\n37,519\n26,556\n184,439\n161,634\n123,387\n2,739\n815\n1,924\n5,124\n5,962\n\n\n08-2023\n40,877\n29,888\n244,708\n217,346\n158,815\n3,309\n925\n2,384\n5,162\n6,180\n\n\n09-2023\n41,125\n30,542\n234,825\n207,319\n157,644\n3,253\n840\n2,412\n4,973\n5,739\n\n\n10-2023\n43,721\n33,452\n226,510\n204,446\n161,334\n3,528\n942\n2,586\n5,546\n6,860\n\n\n11-2023\n46,399\n45,257\n225,261\n204,106\n200,019\n4,431\n1,157\n3,273\n5,692\n7,079\n\n\n12-2023\n58,963\n57,498\n256,874\n233,859\n229,441\n4,642\n1,275\n3,367\n6,001\n7,357\n\n\n\n\n\n\nSales Order Summary P2\n\n\nmonth\naov_gmv\naov_nmv\nasp\ncommission_rate\nmelive_takerate\nml_com_over_gmv\ncommission_per_livestream\ngmv_per_livestream\n\n\n\n\n07-2023\n232,124\n215,227\n203,423\n10.3%\n29.8%\n2.2%\n1\n7\n\n\n08-2023\n188,071\n188,197\n167,042\n11.1%\n27.9%\n2.3%\n1\n8\n\n\n09-2023\n198,365\n193,743\n175,130\n10.6%\n25.8%\n2.0%\n1\n8\n\n\n10-2023\n213,851\n207,348\n193,021\n10.5%\n26.7%\n2.2%\n1\n8\n\n\n11-2023\n227,330\n226,264\n205,981\n9.8%\n26.1%\n2.5%\n1\n8\n\n\n12-2023\n252,132\n250,598\n229,542\n8.1%\n27.5%\n2.2%\n1\n10"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#content-type",
+    "href": "posts/overview-analysis/index.html#content-type",
+    "title": "Overview Analysis",
+    "section": "4.4 Content Type",
+    "text": "4.4 Content Type\n\n\n\nSales Order By Content Type P1\n\n\ncontent_type\ntotal_gmv\ngmv_contribution\ntotal_nmv\nqty_sold\nno_gmv_orders\nno_nmv_orders\ncommission\nmelive_commission\ncreator_commission\nno_livestreams\nno_products\n\n\n\n\na. Livestream\n181,375\n67.5%\n148,695\n848,060\n764,292\n624,544\n14,494\n4,029\n10,466\n11,110\n14,755\n\n\nb. Video\n75,875\n28.2%\n66,353\n468,078\n424,269\n371,281\n6,728\n1,753\n4,975\n7,676\n6,681\n\n\nc. Showcase\n11,355\n4.2%\n8,147\n56,479\n41,697\n36,177\n680\n173\n506\n279\n7,068\n\n\n\n\n\n\nSales Order By Content Type P2\n\n\ncontent_type\naov_gmv\naov_nmv\nasp\ncommission_rate\nmelive_takerate\nml_com_over_gmv\ncommission_per_livestream\ngmv_per_livestream\n\n\n\n\na. Livestream\n237,311\n238,085\n213,870\n9.7%\n27.8%\n2.2%\n1\n16\n\n\nb. Video\n178,836\n178,712\n162,098\n10.1%\n26.1%\n2.3%\n1\n10\n\n\nc. Showcase\n272,314\n225,190\n201,043\n8.3%\n25.5%\n1.5%\n2\n41"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#total-2",
+    "href": "posts/overview-analysis/index.html#total-2",
+    "title": "Overview Analysis",
+    "section": "5.1 Total",
+    "text": "5.1 Total\n\n\n\nLivestream Summary\n\n\nfirst_month\nlast_month\nno_months\ntotal_gmv\nno_livestreams\nno_creators\ntotal_view\ntotal_ads_gmv\ntotal_ads_spent\nads_gmv_contrib\nroas\ngmv_per_livestream\n\n\n\n\n07-2023\n12-2023\n6\n5,794\n6,167\n250\n62,373,299\n618\n135\n10.7%\n5\n1"
+  },
+  {
+    "objectID": "posts/overview-analysis/index.html#by-month",
+    "href": "posts/overview-analysis/index.html#by-month",
+    "title": "Overview Analysis",
+    "section": "5.2 By Month",
+    "text": "5.2 By Month\n\n\n\nLivestream Summary By Month\n\n\nmonth\ntotal_gmv\nno_livestreams\nno_creators\ntotal_view\ntotal_ads_gmv\ntotal_ads_spent\nads_gmv_contrib\nroas\ngmv_per_livestream\n\n\n\n\n07-2023\n236\n456\n90\n3,400,014\n13\n7\n5.7%\n2\n1\n\n\n08-2023\n113\n270\n96\n1,539,971\n4\n3\n3.4%\n1\n0\n\n\n09-2023\n468\n434\n101\n5,593,987\n23\n8\n5.0%\n3\n1\n\n\n10-2023\n1,456\n1,973\n165\n16,130,447\n98\n38\n6.7%\n3\n1\n\n\n11-2023\n623\n632\n127\n7,829,410\n97\n16\n15.6%\n6\n1\n\n\n12-2023\n2,898\n2,402\n161\n27,879,470\n382\n62\n13.2%\n6\n1"
   }
 ]
