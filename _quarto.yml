@@ -2,18 +2,53 @@ project:
   type: website
 
 website:
-  title: "MeLive Advertising Optimization"
+  title: "MeLive"
+  image: "melive_logo.png"
+  page-navigation: true
   navbar:
-    right:
-      - about.qmd
-      - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+    background: white
+    logo: melive_logo.png
+    logo-alt: "Melive logo."
+    title: false
+    collapse-below: lg
+    left:
+      - text: "Project Proposal"
+        href: index.qmd
+      - text: "Insights"
+        href: insights.qmd
+  sidebar:
+    style: "floating"
+    border: true
+    search: true
+    collapse-level: 1
+    contents:
+      - section: "Competitor Overview"
+        contents:
+          - posts/ANALYSIS/market_overview.qmd
+      - section: "Baseline"
+        contents:
+          - posts/overview-analysis/index.qmd
+      - section: "Test"
+        contents:
+          - posts/post-with-code/index.qmd
+          - posts/welcome/index.qmd
+  page-footer: 
+    left: "Copyright 2024, Vi Duong" 
+
+
 format:
   html:
-    theme: sandstone
+    toc: true
+    theme:
+      light: [lux, theme.scss]
+    code-copy: true
+    code-overflow: wrap
     css: styles.css
-
+    grid:
+      sidebar-width: 250px
+      body-width: 900px
+      margin-width: 300px
+      
+freeze: true
 editor: visual
 

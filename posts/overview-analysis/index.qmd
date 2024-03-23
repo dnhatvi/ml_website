@@ -52,7 +52,6 @@ green <- "#00524A"
 
 ```
 
-
 ```{r, include=FALSE}
 load("../../../../[02] Ads Optimization/DATA/gmv_nmv.Rdata")
 load("../../../../[02] Ads Optimization/DATA/livestream_traffic.Rdata")
@@ -64,7 +63,6 @@ link <- "https://docs.google.com/spreadsheets/d/1uuw0D6UYpjpZMLAOPfkzJM-8MoP4yKu
 tiktok_rev <- ReadExcelFiles("../../../../[02] Ads Optimization/DATA/[00] Raw Data/tiktok_last6months_gmv.xlsx")
 
 ```
-
 
 ```{r, include=FALSE}
 gmv_nmv <- gmv_nmv %>%
@@ -127,11 +125,9 @@ sales_order <- paid_sales_order %>%
 
 ```
 
-
-
 # Summary
 
-** Data Source: gmv_nmv
+\*\* Data Source: gmv_nmv
 
 ```{r}
 #| echo: false
@@ -214,7 +210,6 @@ CreatePieChart(data = summary_category %>% filter(category != "Total")
 
 ```
 
-
 # Monthly Summary
 
 ## Monthly Revenue
@@ -291,7 +286,7 @@ CreateCategoryChart(data = chart_data
 
 ### GMV, NMV in November
 
-* To be checked: Why was there this huge gap?
+-   To be checked: Why was there this huge gap?
 
 ```{r}
 #| echo: false
@@ -315,7 +310,6 @@ knitr::kable(november_detail
   kable_styling(full_width = FALSE, bootstrap_options = "striped")
 
 ```
-
 
 ## Monthly Seller
 
@@ -420,7 +414,7 @@ CreateLineChart(data = monthly_creator
 
 # Sales Order Overview
 
-** Data Source: Paid And Unpaid Orders
+\*\* Data Source: Paid And Unpaid Orders
 
 ## Compare With GMV_NMV Source
 
@@ -476,7 +470,6 @@ knitr::kable(compare
 
 
 ```
-
 
 ## Total
 
@@ -539,7 +532,6 @@ knitr::kable(sum_so
 
 
 ```
-
 
 ## Monthly
 
@@ -666,8 +658,7 @@ knitr::kable(sum_so_content_type
 
 # Livestream Data Review
 
-** Data Source: Livestream Traffic
-
+\*\* Data Source: Livestream Traffic
 
 ## Total
 
@@ -700,7 +691,6 @@ knitr::kable(sum_lv
 
 
 ```
-
 
 ## By Month
 
