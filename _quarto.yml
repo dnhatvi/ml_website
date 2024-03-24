@@ -6,6 +6,7 @@ website:
   image: "melive_logo.png"
   page-navigation: true
   open-graph: true
+  site-url: https://melive.io.vn
   navbar:
     background: white
     logo: melive_logo.png
