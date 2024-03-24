@@ -1,0 +1,65 @@
+---
+pagetitle: "Project Proposal"
+page-layout: article
+editor: source
+sidebar: false
+subtitle: "This is the executive summary, scope of work and expected deliverables of MeLive Advertising Optimization Project"
+title-block-banner: true
+---
+
+![](images/banner.png)
+
+## {{< fa exec-summary title="Executive Summary" >}} Executive Summary
+
+<p>Based on my conversation with MeLive Team from MeTub, I understand that MeLive is currently facing significant challenges in the realm of TikTok advertising, particularly in the planning and optimization of their advertising budget. The current process lacks the required smoothness, leading to operational inefficiencies and hindering the overall effectiveness of their marketing endeavors.</p>
+
+<h3>Client's Problem</h3>
+
+<h4>Issued Identified:</h4>
+
+- <b>Fragmented Data:</b> Disparate data sources hinder comprehensive insights and accurate budgeting.
+- <b>TikTok Reliance:</b> Overdependence on TikTok data without cross-verification leads to potential discrepancies.
+- <b>Uncertain Metrics:</b> Lack of clarity on whether metrics accurately reflect campaign effectiveness makes informed decisions difficult.    
+- <b>Cost Optimization:</b> No clear assurance of efficient ad spending, hindering scaling potential.
+
+<h4>Impact on Business:</h4>
+These challenges collectively impact the overall efficiency of advertising efforts on TikTok, potentially resulting in suboptimal resource allocation, missed opportunities, and an inability to accurately gauge the return on investment (ROI) from advertising expenditures.
+
+<h4>Proposed Solution:</h4>
+
+Data Consolidation and Comprehensive Performance Report<p>
+- Ensure a seamless flow of information for comprehensive insights into current advertising budget allocation.
+- Build analysis and supporting reports to understand the current business performance<p>
+
+Dynamic Budget Allocation Algorithm<p>
+- Develop a dynamic budget allocation algorithm that adjusts spending based on campaign performance.
+
+## {{< fa sow title="Scope Of Work" >}} Scope Of Work
+
+The project will center on <b>two primary areas of focus:</b>
+
+<b>1. Enhance Performance & Economics Visibility:</b>
+
+- Improve the understanding and visibility of performance metrics for each business model, including partner creator and full management creator
+
+<b>2. Optimize Advertising Costs:</b>
+
+- Implement strategies to optimize advertising costs, including reducing Return on Ad Spend (ROAS), maximizing Total Revenue, and maximizing Total Commission. The evaluation process will involve the assessment of three distinct scenarios to determine the most effective approach.
+
+## {{< fa deliverables title="Deliverables" >}} Deliverables
+
+The deliverables will be presented in the following formats:
+
+1. Final PDF Report for 3 Scenarios:
+- A conclusive report encompassing the outcomes of the three scenarios, providing insights into the strategies employed, underlying assumptions, and the resulting impact on the specified objectives.
+
+2. PDF Reports for Performance Assessment:
+- Individual PDF reports detailing the performance assessments, supported by relevant analyses for each study conducted.
+
+3. Spreadsheets for Ads Budget Allocation:
+- Compilation and organization of relevant data in spreadsheets, facilitating a clear understanding of the proposed budget allocation strategies for advertising.
+
+## {{< fa outofscope title="Out Of Scope" >}} Out Of Scope
+
+The algorithm & and deployment of the model within the MeLive system are not within the scope of this project. I will collaborate with MeLive to implement the ads allocation budget in March and April 2024 using the developed model. Post-revision and testing, if MeLive is satisfied with the outcomes, the transition to deploy the model within MeLive can be considered in the subsequent phase. This phased approach aims to save development resources for MeLive and ensures the model's efficiency before it becomes an official feature.
+

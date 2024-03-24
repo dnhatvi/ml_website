@@ -1,0 +1,312 @@
+---
+title: "Creator Overview Performance H22023"
+author: "Vi Duong"
+date: "2024-03-20"
+format:
+  html:
+    embed-resources: false
+    toc: true
+    number-sections: true
+    theme: Yeti
+    fontsize: 1.1em
+    linestretch: 1.7
+---
+
+```{r}
+#| echo: false
+#| include: false
+
+library(pacman)
+p_load(dplyr
+       , readxl
+       , janitor
+       , lubridate
+       , stringr
+       , DT
+       , purrr
+       , highcharter
+       , tidyr
+       , reactable
+       , tibble
+       , networkD3
+       , RDataOps
+       , sf
+       , knitr
+       , htmltools
+       , leaflet
+       , plotly
+       , googlesheets4
+       , kableExtra
+       , formattable
+       , cohorts
+       , openxlsx)
+
+source("../source_functions.R")
+
+# Color
+pink <- "#D81159"
+lightpink <- "#FF6893"
+lightgreen <- "#60BAAF"
+green <- "#00524A"
+
+
+```
+
+
+```{r, include=FALSE}
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/gmv_nmv.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/livestream_traffic.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/paid_sales_order.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/unpaid_sales_order.Rdata")
+
+tiktok_rev <- ReadExcelFiles("../../../../[02] Ads Optimization/DATA/[00] Raw Data/tiktok_last6months_gmv.xlsx")
+
+```
+
+
+```{r, include=FALSE}
+gmv_nmv <- gmv_nmv %>%
+  mutate(est_gmv = case_when(gmv <= nmv ~ nmv * (1+0.53)
+                             , TRUE ~ gmv)) %>% 
+  filter(est_gmv > 0) %>% 
+  mutate(creator_type = ifelse(is.na(creator_type), "partner", creator_type)) %>% 
+  mutate(category = case_when(category %in% c("Womenswear", "womenswear") ~ "Trang phục nữ & Đồ lót"
+                              , category %in% c("Menswear") ~ "Trang phục nam & Đồ lót"
+                              , category %in% c("Beauty & personalcare") ~ "Chăm sóc sắc đẹp & Chăm sóc cá nhân"
+                              , category %in% c("Household Appliances", "Home Suppliers") ~ "Đồ gia dụng"
+                              # , category %in% c("Home Suppliers") ~ "Sửa chữa nhà cửa"
+                              , category %in% c("Fashion Accessories") ~ "Phụ kiện thời trang"
+                              , category %in% c("Shoes", "shoes") ~ "Giày"
+                              , category %in% c("Kitchenswear") ~ "Đồ dùng nhà bếp"
+                              , category %in% c("Health") ~ "Sức khỏe"
+                              , category %in% c("Luggage & Bags","luggage and bags") ~ "Hành lý & Túi xách"
+                              , category %in% c("Mom&baby") ~ "Trẻ sơ sinh & thai sản"
+                              , category %in% c("Accessories") ~ "Phụ kiện trang sức & Phái sinh"
+                              , category %in% c("Phone & Electronic") ~ "Điện thoại & Đồ điện tử"
+                              , category %in% c("f&B", "F&B") ~ "Đồ ăn & Đồ uống"
+                              , category %in% c("Grocery") ~ "Đồ ăn & Đồ uống"
+                              , TRUE ~ "Unknown"))
+
+sales_order <- paid_sales_order %>%
+  mutate(payment = "online") %>% 
+  bind_rows(unpaid_sales_order %>% mutate(payment = "cod")) %>% 
+  filter(gmv > 0) %>% 
+  mutate(content_type = case_when(content_type == "Livestream" ~ "a. Livestream"
+                                  , content_type == "Video" ~ "b. Video"
+                                  , content_type == "Showcase" ~ "c. Showcase")) %>% 
+  mutate(creator_type = ifelse(is.na(creator_type), "partner", creator_type)) %>% 
+  mutate(category = case_when(category %in% c("Womenswear", "womenswear") ~ "Trang phục nữ & Đồ lót"
+                              , category %in% c("Menswear") ~ "Trang phục nam & Đồ lót"
+                              , category %in% c("Beauty & personalcare") ~ "Chăm sóc sắc đẹp & Chăm sóc cá nhân"
+                              , category %in% c("Household Appliances", "Home Suppliers") ~ "Đồ gia dụng"
+                              # , category %in% c("Home Suppliers") ~ "Sửa chữa nhà cửa"
+                              , category %in% c("Fashion Accessories") ~ "Phụ kiện thời trang"
+                              , category %in% c("Shoes", "shoes") ~ "Giày"
+                              , category %in% c("Kitchenswear") ~ "Đồ dùng nhà bếp"
+                              , category %in% c("Health") ~ "Sức khỏe"
+                              , category %in% c("Luggage & Bags","luggage and bags") ~ "Hành lý & Túi xách"
+                              , category %in% c("Mom&baby") ~ "Trẻ sơ sinh & thai sản"
+                              , category %in% c("Accessories") ~ "Phụ kiện trang sức & Phái sinh"
+                              , category %in% c("Phone & Electronic") ~ "Điện thoại & Đồ điện tử"
+                              , category %in% c("f&B", "F&B") ~ "Đồ ăn & Đồ uống"
+                              , category %in% c("Grocery") ~ "Đồ ăn & Đồ uống"
+                              , TRUE ~ "Unknown"))
+
+```
+
+
+<h5><small>Assumption and Data Sources</h5>
+Currency Unit: million VND (mil VND)
+
+Data Source:
+
++ <a href="https://docs.google.com/spreadsheets/d/1xbRY4NMogM-cBNS9AgnyZdbQjSRu7ndb/edit?rtpof=true" target="_blank">gmv_nmv</a>
+
++ <a href="https://docs.google.com/spreadsheets/d/1uu3jFVrzWypBHbKWMJUw4vUw1pB7CWEj/edit?usp=drive_web&ouid=111954422688434683996&rtpof=true" target="_blank">paid_sales_order</a>
+
++ <a href="https://docs.google.com/spreadsheets/d/14sIyqLdIXsbGSuF5r_paD33MbsXM3yHe/edit?usp=drive_web&ouid=111954422688434683996&rtpof=true" target="_blank">unpaid_sales_order</a></small>
+
+# Executive Summary
+
+**Key Findings:**
+
+- Creator Impact on Revenue: Creator type significantly impacts revenue generation. Creators with no commission sharing contribute the highest average GMV (2.4 billion VND) but minimal commission (2.5%) to MeLive.
+- Top Performers: Our analysis identified 76 "A class" creators (20%) contributing a substantial 90% of total NMV. Notably, this group includes creators from all three categories – no commission sharing, full management, and partners.
+- Full Management Potential: While only 3 out of 6 full-management creators are currently classified as "A class," their presence highlights the potential for high performance, low cancellation rates, and strong commission generation within this category.
+- Category Focus: An analysis of top NMV creators reveals a lack of category diversification, with most focusing on a single dominant category (except Vu Duy and Linh An).
+
+# Revenue
+<i>Source: gmv_nmv</i>
+
+- There's a significant difference in GMV generated by different creator types. Creators with no commission sharing generated an average of 2.4 billion VND each over six months, which is double the average GMV of both full-time creators and partner creators.
+
+```{r}
+#| echo: false
+#| warning: false
+summary_seller_creator <- gmv_nmv %>%
+  group_by(creator_type) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_est_gmv = sum(est_gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , no_creators = n_distinct(creator)) %>% 
+  ungroup() %>%
+  mutate(gmv_contrib = percent(total_est_gmv/sum(total_est_gmv), digits =1)) %>% 
+  adorn_totals() %>% 
+  mutate(nmv_over_gmv = total_nmv/total_gmv) %>% 
+  mutate(nmv_over_gmv = percent(nmv_over_gmv, digits = 1)) %>% 
+  mutate(gmv_per_creator = total_est_gmv/no_creators)
+
+knitr::kable(summary_seller_creator
+             , digits = 0
+             , caption = "Revenue By Creator Type"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+
+```
+
+## Segment
+
+- While Gross Merchandise Value (GMV) data may have limitations in accuracy, the Net Merchandise Value (NMV) will be used as the primary KPI for evaluating performance across different creator types due to variations in the NMV/GMV ratio.
+
+- An analysis of creator classification reveals that 76 creators (20%) fall into the top-performing "A class," contributing to a significant 90% of total NMV. Notably, this group includes 3 creators from both the "no commission sharing" and "full management" categories.
+
+- While only 3 out of 6 full-management creators are classified as "A class," their presence in this top tier emphasizes the potential for this creator type to achieve excellent performance with low cancellation rates and high commission generation.
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+creator_abc_nmv <- gmv_nmv %>% 
+  group_by(creator, creator_type) %>% 
+  summarise(nmv = sum(nmv)/10^6
+            , no_months = n_distinct(month)
+            , no_sellers = n_distinct(seller)) %>% 
+  ungroup() %>%
+  mutate(nmv_per_month = nmv/no_months
+         , nmv_per_seller = nmv/no_sellers/no_months) %>%
+  ABCClassify(valueCol = nmv, abcRange = c(90,95)) %>% 
+  mutate(rank = row_number())
+
+summary_abc <- creator_abc_nmv %>% 
+  group_by(abcclass, creator_type) %>% 
+  summarise(no_creators = n_distinct(creator)
+            , nmv = sum(nmv)
+            , avg_no_seller = mean(no_sellers)
+            , avg_nmv_per_creator_month = mean(nmv_per_month)
+            , avg_nmv_per_seller_month = mean(nmv_per_seller)) %>% 
+  ungroup() %>%
+  mutate(percent_no_creators = no_creators/sum(no_creators)) %>% 
+  ungroup() %>% 
+  mutate(percent_no_creators = percent(percent_no_creators, digits = 1)) %>% 
+  select(abcclass, no_creators, percent_no_creators, everything())
+
+knitr::kable(summary_abc
+             , digits = 0
+             , caption = "Number Of Creators By Segment"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+```
+
+## By Category
+
+### Top Creator With Category
+
+- An analysis of the top 30 creators ranked by Net Merchandise Value (NMV) reveals that, with the exception of Vu Duy and Linh An, all other creators appear to focus on a single dominant category.
+
+```{r}
+#| echo: false
+#| warning: false
+
+creator_by_category <- gmv_nmv %>% 
+  group_by(creator, category) %>% 
+  summarise(nmv = sum(nmv)/10^6) %>% 
+  ungroup() %>%
+  arrange(desc(nmv)) %>%
+  filter(creator %in% creator_abc_nmv$creator[creator_abc_nmv$abcclass == "A"]) %>% 
+  head(30) %>% 
+  pivot_wider(names_from = category, values_from = nmv) %>% 
+  mutate_if(is.numeric, replace_na, 0)
+
+knitr::kable(creator_by_category
+             , digits = 0
+             , caption = "Top 30 creators and category"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+```
+
+# Commission
+
+<i>Source: sales_order</i>
+
+**Commission Structure by Creator Type**
+
+- **Creator No Sharing Fee:** While these creators contribute significantly to GMV (12.4%), their commission to MeLive is minimal (2.5%) because they do not share revenue. Additionally, they generate the lowest average commission per seller (5.8%) compared to other creator types. In a single livestream, the average commission earned by MeLive from a Creator No Sharing Fee is only 140,000 VND.
+
+- **Full Management Creators:** Despite a lower contribution to GMV (1.4%), full management creators generate a higher commission share for MeLive (6.7%) due to their employment structure. They also boast a higher average commission per seller (10.2%). Interestingly, full management creators appear to be particularly effective in livestreaming, generating an average commission of 837,000 VND for MeLive per livestream.
+
+- **Partner Creators:** These creators fall between the two extremes, contributing a healthy portion of GMV (86.2%) and generating a balanced commission rate for MeLive (around 10.2%). Their average commission per seller aligns with full management creators (10.2%) and their average commission per livestream falls in the middle (308,000 VND).
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_so_creator_type <- sales_order %>%
+  group_by(creator_type) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup() %>% 
+  mutate(gmv_contribution = percent(total_gmv/sum(total_gmv), digits = 1)) %>%
+  select(creator_type, total_gmv, gmv_contribution, everything())
+
+knitr::kable(sum_so_creator_type
+             , digits = 0 
+             , caption = "Sales Order By Creator Type P1"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+sum_so_creator_type <- sum_so_creator_type %>% 
+  group_by(creator_type) %>% 
+  summarise(aov_gmv = total_gmv/no_gmv_orders * 10^6
+            , aov_nmv = total_nmv/no_nmv_orders * 10^6
+            , asp = total_gmv* 10^6/qty_sold
+            , commission_rate = percent(commission/total_nmv, digits = 1)
+            , melive_takerate = percent(melive_commission/commission, digits = 1)
+            , ml_com_over_gmv = percent(melive_commission/total_gmv, digits = 1)
+            , ml_commission_per_livestream = melive_commission/no_livestreams * 10^6
+            , gmv_per_livestream = total_gmv/no_livestreams) %>%
+  ungroup() %>% 
+  arrange(creator_type)
+
+knitr::kable(sum_so_creator_type
+             , digits = 1
+             , caption = "Sales Order By Content Type P2"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+```
+
+
+
+
+
+
+
+
+
+

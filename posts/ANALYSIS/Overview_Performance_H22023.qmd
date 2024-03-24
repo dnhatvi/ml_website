@@ -1,0 +1,722 @@
+---
+title: "MeLive Overview Performance H22023"
+author: "Vi Duong"
+date: "2024-03-20"
+format:
+  html:
+    embed-resources: false
+    toc: true
+    number-sections: true
+    theme: Yeti
+    fontsize: 1.1em
+    linestretch: 1.7
+---
+
+```{r}
+#| echo: false
+#| include: false  
+
+library(pacman)
+p_load(dplyr
+       , readxl
+       , janitor
+       , lubridate
+       , stringr
+       , DT
+       , purrr
+       , highcharter
+       , tidyr
+       , reactable
+       , tibble
+       , networkD3
+       , RDataOps
+       , sf
+       , knitr
+       , htmltools
+       , leaflet
+       , plotly
+       , googlesheets4
+       , kableExtra
+       , formattable
+       , cohorts
+       , openxlsx)
+
+source("../source_functions.R")
+
+# Color
+pink <- "#D81159"
+lightpink <- "#FF6893"
+lightgreen <- "#60BAAF"
+green <- "#00524A"
+
+
+```
+
+```{r, include=FALSE}
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/gmv_nmv.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/livestream_traffic.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/paid_sales_order.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/unpaid_sales_order.Rdata")
+
+link <- "https://docs.google.com/spreadsheets/d/1uuw0D6UYpjpZMLAOPfkzJM-8MoP4yKujC0iaE1rQkRE/edit#gid=0"
+
+tiktok_rev <- ReadExcelFiles("../../../../[02] Ads Optimization/DATA/[00] Raw Data/tiktok_last6months_gmv.xlsx")
+
+```
+
+```{r, include=FALSE}
+gmv_nmv <- gmv_nmv %>%
+  mutate(est_gmv = case_when(gmv <= nmv ~ nmv * (1+0.53)
+                             , TRUE ~ gmv)) %>% 
+  filter(est_gmv > 0) %>% 
+  mutate(creator_type = ifelse(is.na(creator_type), "partner", creator_type)) %>% 
+  mutate(category = case_when(category %in% c("Womenswear", "womenswear") ~ "Trang phục nữ & Đồ lót"
+                              , category %in% c("Menswear") ~ "Trang phục nam & Đồ lót"
+                              , category %in% c("Beauty & personalcare") ~ "Chăm sóc sắc đẹp & Chăm sóc cá nhân"
+                              , category %in% c("Household Appliances", "Home Suppliers") ~ "Đồ gia dụng"
+                              # , category %in% c("Home Suppliers") ~ "Sửa chữa nhà cửa"
+                              , category %in% c("Fashion Accessories") ~ "Phụ kiện thời trang"
+                              , category %in% c("Shoes", "shoes") ~ "Giày"
+                              , category %in% c("Kitchenswear") ~ "Đồ dùng nhà bếp"
+                              , category %in% c("Health") ~ "Sức khỏe"
+                              , category %in% c("Luggage & Bags","luggage and bags") ~ "Hành lý & Túi xách"
+                              , category %in% c("Mom&baby") ~ "Trẻ sơ sinh & thai sản"
+                              , category %in% c("Accessories") ~ "Phụ kiện trang sức & Phái sinh"
+                              , category %in% c("Phone & Electronic") ~ "Điện thoại & Đồ điện tử"
+                              , category %in% c("f&B", "F&B") ~ "Đồ ăn & Đồ uống"
+                              , category %in% c("Grocery") ~ "Đồ ăn & Đồ uống"
+                              , TRUE ~ "Unknown"))
+
+sales_order <- paid_sales_order %>%
+  mutate(payment = "online") %>% 
+  bind_rows(unpaid_sales_order %>% mutate(payment = "cod")) %>% 
+  filter(gmv > 0) %>% 
+  mutate(content_type = case_when(content_type == "Livestream" ~ "a. Livestream"
+                                  , content_type == "Video" ~ "b. Video"
+                                  , content_type == "Showcase" ~ "c. Showcase")) %>% 
+  mutate(creator_type = ifelse(is.na(creator_type), "partner", creator_type)) %>% 
+  mutate(category = case_when(category %in% c("Womenswear", "womenswear") ~ "Trang phục nữ & Đồ lót"
+                              , category %in% c("Menswear") ~ "Trang phục nam & Đồ lót"
+                              , category %in% c("Beauty & personalcare") ~ "Chăm sóc sắc đẹp & Chăm sóc cá nhân"
+                              , category %in% c("Household Appliances", "Home Suppliers") ~ "Đồ gia dụng"
+                              # , category %in% c("Home Suppliers") ~ "Sửa chữa nhà cửa"
+                              , category %in% c("Fashion Accessories") ~ "Phụ kiện thời trang"
+                              , category %in% c("Shoes", "shoes") ~ "Giày"
+                              , category %in% c("Kitchenswear") ~ "Đồ dùng nhà bếp"
+                              , category %in% c("Health") ~ "Sức khỏe"
+                              , category %in% c("Luggage & Bags","luggage and bags") ~ "Hành lý & Túi xách"
+                              , category %in% c("Mom&baby") ~ "Trẻ sơ sinh & thai sản"
+                              , category %in% c("Accessories") ~ "Phụ kiện trang sức & Phái sinh"
+                              , category %in% c("Phone & Electronic") ~ "Điện thoại & Đồ điện tử"
+                              , category %in% c("f&B", "F&B") ~ "Đồ ăn & Đồ uống"
+                              , category %in% c("Grocery") ~ "Đồ ăn & Đồ uống"
+                              , TRUE ~ "Unknown"))
+
+
+# missing_seller <- sales_order %>%
+#   mutate(is_seller_avail = ifelse(is.na(seller), FALSE, TRUE)) %>%
+#   group_by(is_seller_avail) %>%
+#   summarise(gmv = sum(gmv)
+#             , nmv = sum(nmv)) %>%
+#   ungroup() %>%
+#   mutate(percent_gmv = gmv/sum(gmv)
+#          , percent_nmv = nmv/sum(nmv))
+
+
+```
+
+<h5><small>Assumption and Data Sources</h5>
+
+-   Currency Unit: million VND (mil VND)
+
+-   Data Source:
+
+-   <a href="https://docs.google.com/spreadsheets/d/1xbRY4NMogM-cBNS9AgnyZdbQjSRu7ndb/edit?rtpof=true" target="_blank">gmv_nmv</a>
+
+-   <a href="https://docs.google.com/spreadsheets/d/1ZjNETGG-smwQeTYaXo9DFo8hNLS-dIct/edit?rtpof=true" target="_blank">livestream_traffic</a>
+
+-   <a href="https://docs.google.com/spreadsheets/d/1uu3jFVrzWypBHbKWMJUw4vUw1pB7CWEj/edit?usp=drive_web&ouid=111954422688434683996&rtpof=true" target="_blank">paid_sales_order</a>
+
+-   <a href="https://docs.google.com/spreadsheets/d/14sIyqLdIXsbGSuF5r_paD33MbsXM3yHe/edit?usp=drive_web&ouid=111954422688434683996&rtpof=true" target="_blank">unpaid_sales_order</a></small>
+
+# Executive Summary
+
+**MeLive Performance and Growth Opportunities (H2 2023)**
+
+**Revenue and Sales:**
+
+-   MeLive achieved an estimated Gross Merchandise Value (Est. GMV) of approximately 433 billion VND in H2 2023, reflecting strong growth (CMGR 23.3%). However, a data discrepancy requires validation (reported vs. estimated GMV).
+-   Net Merchandise Value (NMV) grew at a slower rate (17.1%) compared to Est. GMV, suggesting a potential rise in cancellations. Revenue per seller is increasing, but seller growth lags behind Est. GMV growth, highlighting the need for seller expansion strategies.
+
+**Creator Performance:**
+
+-   Partner creators are the backbone, contributing 86.2% of Est. GMV with a balanced NMV ratio (57%). Creator No Sharing Fee contribute high GMV (12.4%) but minimal commission (2.4%) due to their revenue-sharing structure.
+-   Full-Management Creators, despite low GMV contribution (1.4%), boast the highest NMV ratio and lowest cancellation rates, indicating high potential for strategic development.
+-   A lack of category diversification among top creators is evident, suggesting an opportunity to encourage broader content reach.
+
+**Data Quality and Next Steps:**
+
+-   Significant data discrepancies across sources necessitate immediate investigation and correction to ensure reliable decision-making.
+-   Further analysis of creator performance should utilize NMV as the primary KPI due to variations in the NMV/Est. GMV ratio.
+
+# Total Overview
+
+<i>Source: gmv_nmv</i>
+
+-   Revenue: Approximately 380 billion VND (\~380k mil VND).
+-   Estimated Gross Merchandise Value (Est. GMV): Approximately 433 billion VND. There was a discrepancy with reported GMV due to an unlinking issue in November. Est. GMV is used in this report for a more accurate picture.
+-   Net Merchandise Value (NMV): 201 billion VND. The NMV/Est. NMV ratio was 53%.
+-   On average, one creator earned approximately 200 million VND per month across the six-month period, while one seller generated an average of 23.8 million VND monthly.
+
+```{r}
+#| echo: false
+#| warning: false
+summary_seller_creator <- gmv_nmv %>% 
+  summarise(first_month = min(month)
+            , last_month = max(month)
+            , no_months = n_distinct(month)
+            , total_gmv = sum(gmv)/10^6
+            , total_est_gmv = sum(est_gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , no_sellers = n_distinct(seller)
+            , no_creators = n_distinct(creator)) %>% 
+  ungroup() %>% 
+  mutate(nmv_over_gmv = total_nmv/total_gmv) %>% 
+  mutate(nmv_over_gmv = percent(nmv_over_gmv, digits = 1))
+
+knitr::kable(summary_seller_creator
+             , digits = 0
+             , caption = "Number of active sellers and creators"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+monthly_summary_seller_creator <- gmv_nmv %>%
+  group_by(month) %>% 
+  summarise(no_sellers = n_distinct(seller)
+            , no_creators = n_distinct(creator)
+            , gmv = sum(gmv)/10^6
+            , est_gmv = sum(est_gmv)/10^6
+            , nmv = sum(nmv)/10^6) %>% 
+  ungroup() %>% 
+  summarise(avg_monthly_seller = mean(no_sellers)
+            , avg_monthly_creators = mean(no_creators)
+            , avg_monthly_gmv = mean(gmv)
+            , avg_monthly_est_gmv = mean(est_gmv)
+            , avg_monthly_nmv = mean(nmv))
+
+knitr::kable(monthly_summary_seller_creator
+             , digits = 0
+             , caption = "Average active sellers and creators per month"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+```
+
+There are three primary creator categories on MeLive, each with distinct commission structures and performance characteristics:
+
+-   **Creator No Sharing Fee:** These are typically high-profile talents and key opinion leaders (KOLs) who generate significant revenue but do not share commission with MeLive. While contributing to 12.4% of GMV, their low NMV ratio (24%) suggests a high rate of cancellations or refunds.
+-   **Partners:** This is the largest creator group, representing 340 out of 368 total creators (H2 2023). They share commission with MeLive, typically ranging from 30% to 70% (with MeLive receiving the remaining share). Partners contribute significantly to the platform, generating 86.2% of GMV and achieving a NMV ratio of around 57%.
+-   **Full Management Creators:** These are MeLive's full-time employees who receive a fixed salary and share 100% of their commission with the platform. While boasting the highest NMV ratio and lowest cancellation rate, their contribution to GMV is currently the lowest at 1.4%.
+
+```{r}
+#| echo: false
+#| warning: false
+
+summary_seller_creator_by_type <- gmv_nmv %>% 
+  group_by(creator_type) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_est_gmv = sum(est_gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , no_sellers = n_distinct(seller)
+            , no_creators = n_distinct(creator)) %>% 
+  ungroup() %>%
+  mutate(contrib_est_gmv = percent(total_est_gmv/sum(total_est_gmv), digits = 1)) %>%
+  adorn_totals() %>% 
+  mutate(nmv_over_gmv = total_nmv/total_gmv) %>% 
+  mutate(nmv_over_gmv = percent(nmv_over_gmv, digits = 1))
+
+knitr::kable(summary_seller_creator_by_type
+             , digits = 0
+             , caption = "Est GMV by creator type (mil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+```
+
+# Monthly Summary
+
+## Monthly Revenue
+
+### Total
+
+-   Over six months, MeLive's estimated Gross Merchandise Value (Est. GMV) experienced a strong compounded monthly growth rate (CMGR) of 23.3%. This translates to an increase in estimated revenue of 23.3% each month. However, Net Merchandise Value (NMV) only grew by 17.1% during the same period. This discrepancy suggests that the cancellation rate might be rising faster than revenue growth.
+
+```{r}
+#| echo: false
+#| warning: false
+
+monthly_sales <- gmv_nmv %>% 
+  group_by(month) %>% 
+  summarise(gmv = sum(gmv)/10^6
+            , est_gmv = sum(est_gmv)/10^6
+            , nmv = sum(nmv)/10^6) %>% 
+  ungroup() %>%
+  arrange(month) 
+
+# Table 
+
+table <- monthly_sales %>%
+  mutate(month = format(month, "%Y-%m")) %>% 
+  pivot_longer(cols = c("gmv", "est_gmv", "nmv")
+               , names_to = "metric"
+               , values_to = "value") %>% 
+  pivot_wider(names_from = c("month")
+              , values_from = "value")
+
+growth_rate <- monthly_sales %>% 
+  mutate(month = format(month, "%Y-%m")) %>% 
+  CalculateCMGR(valueCol = gmv, n = length(unique(monthly_sales$month)) -1) %>%
+  rename(gmv_cmgr = CMGR) %>% 
+  CalculateCMGR(valueCol = est_gmv, n = length(unique(monthly_sales$month)) -1) %>%
+  rename(est_gmv_cmgr = CMGR) %>% 
+  CalculateCMGR(valueCol = nmv, n = length(unique(monthly_sales$month)) -1) %>%
+  rename(nmv_cmgr = CMGR) %>% 
+  summarise(gmv_cmgr = percent(gmv_cmgr, digits = 1)
+            , est_gmv_cmgr = percent(est_gmv_cmgr, digits = 1)
+            , nmv_cmgr = percent(nmv_cmgr, digits = 1)) %>% 
+  filter(!is.na(gmv_cmgr))
+
+knitr::kable(growth_rate
+             , digits = 0
+             , caption = "Compound Monthly Growth Rate"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+knitr::kable(table
+             , digits = 0
+             , caption = "Sales Through Time"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+# Plot the chart
+
+chart_data <- monthly_sales %>%
+  mutate(month = format(month, "%Y-%m")) %>% 
+  pivot_longer(cols = c("gmv", "est_gmv" ,"nmv")
+               , names_to = "metric"
+               , values_to = "value")
+
+CreateCategoryChart(data = chart_data
+                , colY = value
+                , colX = month
+                , groupCol = metric
+                , colYTitle = "mil VND"
+                , showAverageValue = FALSE) %>% 
+  hc_title(text = "Sales Trend Over Time") %>% 
+  hc_caption(text = "<i>Data Source: gmv_nmv<i>")
+```
+
+-   The significant discrepancy between estimated GMV (est_gmv) and recorded GMV in this chart highlights the need for data validation and potential corrections.
+
+## Monthly Seller
+
+-   While the average number of active sellers with sales grew at a modest Compound Monthly Growth Rate (CMGR) of 8.4% over a period, the Est. GMV was significantly higher at 24%. This suggests that revenue per seller has been increasing. However, the lower growth rate in active sellers compared to Est. GMV warrants further investigation. This could indicate a need for seller expansion strategies to keep pace with rising revenue.
+
+```{r}
+#| echo: false
+#| warning: false
+
+monthly_seller <- gmv_nmv %>% 
+  group_by(month) %>% 
+  summarise(no_sellers = n_distinct(seller)) %>% 
+  ungroup() %>%
+  arrange(month)
+
+# Table 
+table <- monthly_seller %>%
+  mutate(month = format(month, "%Y-%m")) %>% 
+  pivot_wider(names_from = month
+              , values_from = no_sellers)
+
+growth_rate <- monthly_seller %>% 
+  mutate(month = format(month, "%Y-%m")) %>% 
+  CalculateCMGR(valueCol = no_sellers, n = length(unique(monthly_seller$month)) -1) %>% 
+  summarise(CMGR = percent(CMGR, digits = 1)) %>% 
+  filter(!is.na(CMGR))
+
+knitr::kable(growth_rate
+             , digits = 0
+             , caption = "Compound Monthly Growth Rate"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+knitr::kable(table
+             , digits = 0
+             , caption = "Number Of Sellers Through Time"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+# Plot the chart
+
+CreateLineChart(data = monthly_seller
+                , colY = no_sellers
+                , colX = month
+                , colYTitle = "Number Of Sellers"
+                , showAverageValue = TRUE) %>%
+  hc_colors(CreateMetubColor()) %>% 
+  hc_title(text = "Active Sellers Trend Over Time") %>% 
+  hc_caption(text = "<i>Data Source: gmv_nmv<i>")
+```
+
+## Monthly Creator
+
+-   The average number of active creators with sales was 240. Notably, the CMGR of active creators (3.7%) was the lowest compared to sellers and revenue growth.
+
+```{r}
+#| echo: false
+#| warning: false
+
+monthly_creator <- gmv_nmv %>% 
+  group_by(month) %>% 
+  summarise(no_creators = n_distinct(creator)) %>% 
+  ungroup() %>%
+  arrange(month)
+
+# Table
+table <- monthly_creator %>%
+  mutate(month = format(month, "%Y-%m")) %>% 
+  pivot_wider(names_from = month
+              , values_from = no_creators)
+
+growth_rate <- monthly_creator %>% 
+  mutate(month = format(month, "%Y-%m")) %>% 
+  CalculateCMGR(valueCol = no_creators, n = length(unique(monthly_creator$month)) -1) %>% 
+  summarise(CMGR = percent(CMGR, digits = 1)) %>% 
+  filter(!is.na(CMGR))
+
+knitr::kable(growth_rate
+             , digits = 0
+             , caption = "Compound Monthly Growth Rate"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+knitr::kable(table
+             , digits = 0
+             , caption = "Number Of Creators Through Time"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+# Plot the chart
+
+CreateLineChart(data = monthly_creator
+                , colY = no_creators
+                , colX = month
+                , colYTitle = "Number Of Creators"
+                , showAverageValue = TRUE) %>%
+  hc_colors(CreateMetubColor()) %>% 
+  hc_title(text = "Active Sellers Trend Over Time") %>% 
+  hc_caption(text = "<i>Data Source: gmv_nmv<i>")
+
+```
+
+# Sales Order Overview
+
+<i>Source: Paid And Unpaid Orders</i>
+
+## Compare With GMV_NMV Source
+
+-   A significant discrepancy exists between the GMV and NMV reported from two sources. The GMV in the "sales order" data is 38% lower than the GMV in the "gmv_nmv" source, while NMV in the "sales order" data is 11% higher. This inconsistency requires thorough validation and correction before proceeding with further analysis.
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_nmv_gmv <- summary_seller_creator %>% 
+  select(-total_gmv) %>%
+  rename(total_gmv = total_est_gmv) %>% 
+  mutate(source = "gmv_nmv") %>% 
+  mutate(first_month = format(first_month,"%m-%Y")) %>%
+  mutate(last_month = format(last_month,"%m-%Y"))
+
+sum_so <- sales_order %>% 
+  summarise(first_month = min(month)
+            , last_month = max(month)
+            , no_months = n_distinct(month)
+            , total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , no_sellers = n_distinct(seller)
+            , no_creators = n_distinct(creator)) %>% 
+  ungroup() %>% 
+  mutate(nmv_over_gmv = total_nmv/total_gmv) %>% 
+  mutate(nmv_over_gmv = percent(nmv_over_gmv, digits = 1))
+
+knitr::kable(sum_so
+             , digits = 0
+             , caption = "Summary Paid And Unpaid Sales Order"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+sum_so <- sum_so %>% 
+  mutate(source = "paid_unpaid_sales_order")
+
+compare <- sum_nmv_gmv %>% 
+  bind_rows(sum_so) %>% 
+  select(source, everything()) %>% 
+  mutate(gap_gmv = percent((total_gmv - lag(total_gmv))/lag(total_gmv), digits = 1)) %>% 
+  mutate(gap_nmv = percent((total_nmv - lag(total_nmv))/lag(total_nmv), digits = 1)) %>% 
+  mutate(gap_sellers = percent((no_sellers - lag(no_sellers))/lag(no_sellers), digits = 1)) %>% 
+  mutate(gap_creators = percent((no_creators - lag(no_creators))/lag(no_creators), digits = 1))
+
+
+knitr::kable(compare
+             , digits = 0
+             , caption = "Compare GMV/NMV Gap 2 Sources"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+```
+
+## Total
+
+**MeLive Revenue and Commission Structure (H2 2023):**
+
+-   MeLive generated approximately 6 billion VND in commission fees after sharing a portion with creators. This translates to a commission rate of 2.2% on total revenue. However, the accuracy of these figures requires further verification due to potential data inconsistencies.
+-   The average commission rate from brands was 9.8%. MeLive typically retains 27.2% of this commission, with the remaining portion shared with creators.
+-   On average, a single livestream generated an estimated Gross Merchandise Value (GMV) of 14 million VND, with a corresponding commission of approximately 312,000 VND. Again, these figures might be skewed by data inaccuracies.
+
+**Product Portfolio:**
+
+In H2 2023, MeLive's product portfolio comprised roughly 19,334 products. While this represents a sizable selection, it is considerably smaller compared to established e-commerce businesses like Tiki, which boasts a stock of approximately 25,000 products.
+
+```{r}
+#| echo: false
+#| warning: false
+
+# check <- sales_order %>% 
+#   mutate(gap = promotion_price/selling_price) %>% 
+#   mutate(product_value = promotion_price * qty_sold) %>% 
+#   mutate(gap = product_value - gmv)
+
+sum_so <- sales_order %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup()
+
+knitr::kable(sum_so
+             , digits = 0
+             , caption = "Sales Order Summary P1"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+sum_so <- sales_order %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup() %>% 
+  summarise(aov_gmv = total_gmv/no_gmv_orders * 10^6
+         , aov_nmv = total_nmv/no_nmv_orders * 10^6
+         , asp = total_gmv* 10^6/qty_sold
+         , commission_rate = percent(commission/total_nmv, digits = 1)
+         , melive_takerate = percent(melive_commission/commission, digits = 1)
+         , ml_com_over_gmv = percent(melive_commission/total_gmv, digits = 1)
+         , ml_commission_per_livestream = melive_commission/no_livestreams  * 10^6
+         , gmv_per_livestream = total_gmv/no_livestreams)
+
+knitr::kable(sum_so
+             , digits = 0
+             , caption = "Sales Order Summary P2"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+```
+
+## Monthly
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_so <- sales_order %>%
+  group_by(month) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup()
+
+knitr::kable(sum_so
+             , digits = 0
+             , caption = "Sales Order Summary P1"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+sum_so <- sales_order %>%
+  group_by(month) %>%
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup() %>% 
+  group_by(month) %>% 
+  summarise(aov_gmv = total_gmv/no_gmv_orders * 10^6
+         , aov_nmv = total_nmv/no_nmv_orders * 10^6
+         , asp = total_gmv* 10^6/qty_sold
+         , commission_rate = percent(commission/total_nmv, digits = 1)
+         , melive_takerate = percent(melive_commission/commission, digits = 1)
+         , ml_com_over_gmv = percent(melive_commission/total_gmv, digits = 1)
+         , commission_per_livestream = commission/no_livestreams
+         , gmv_per_livestream = total_gmv/no_livestreams)
+
+knitr::kable(sum_so
+             , digits = 0
+             , caption = "Sales Order Summary P2"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+```
+
+## Content Type
+
+-   MeLive leverages three primary content formats to drive sales: Livestream (67.5%), Video (28.2%), and Showcase (4.2%).
+-   While Livestream currently generates the majority of commission (4 billion VND out of 6 billion VND), video content offers a slightly higher commission rate (10.1% vs. 9.7%). Additionally, MeLive's commission as a percentage of GMV is slightly higher for video (2.3%) compared to Livestream (2.2%).
+-   Given the lower operational cost associated with video content creation, exploring its expansion as a focus area could be a strategic move for MeLive.
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_so_content_type <- sales_order %>%
+  group_by(content_type) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup() %>% 
+  mutate(gmv_contribution = percent(total_gmv/sum(total_gmv), digits = 1)) %>% 
+  select(content_type, total_gmv, gmv_contribution, everything())
+
+knitr::kable(sum_so_content_type
+             , digits = 0
+             , caption = "Sales Order By Content Type P1"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+sum_so_content_type <- sales_order %>%
+  group_by(content_type) %>% 
+  summarise(total_gmv = sum(gmv)/10^6
+            , total_nmv = sum(nmv)/10^6
+            , qty_sold = sum(qty_sold)
+            , no_gmv_orders = n_distinct(order_code)
+            , no_nmv_orders = n_distinct(order_code[nmv > 0])
+            , commission = sum(commission)/10^6
+            , melive_commission = sum(melive_commission)/10^6
+            , creator_commission = sum(creator_commission)/10^6
+            , no_livestreams = n_distinct(content_id)
+            , no_products = n_distinct(product_id)) %>% 
+  ungroup() %>%
+  group_by(content_type) %>% 
+  summarise(aov_gmv = total_gmv/no_gmv_orders * 10^6
+            , aov_nmv = total_nmv/no_nmv_orders * 10^6
+            , asp = total_gmv* 10^6/qty_sold
+            , commission_rate = percent(commission/total_nmv, digits = 1)
+            , melive_takerate = percent(melive_commission/commission, digits = 1)
+            , ml_com_over_gmv = percent(melive_commission/total_gmv, digits = 1)
+            , ml_commission_per_livestream = melive_commission/no_livestreams  * 10^6
+            , gmv_per_livestream = total_gmv/no_livestreams) %>% 
+  ungroup()
+
+knitr::kable(sum_so_content_type
+             , digits = 0
+             , caption = "Sales Order By Content Type P2"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+```
+
+# Livestream Data Review
+
+<i>Source: Livestream Traffic</i>
+
+While this data source is crucial for analyzing advertising performance, it only reflects a total GMV of 5 billion VND over six months. This significant discrepancy with other data sources necessitates immediate investigation and potential data corrections.
+
+## Total
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_lv <- livestream_traffic %>%
+   summarise(first_month = min(month)
+            , last_month = max(month)
+            , no_months = n_distinct(month)
+            , total_gmv = sum(gmv)/10^3
+            , no_livestreams = n_distinct(livestream_id)
+            , no_creators = n_distinct(creator)
+            , total_view = sum(total_view)
+            , total_ads_gmv = sum(ads_gmv)/10^3
+            , total_ads_spent = sum(ads_spent)/10^3) %>% 
+  ungroup() %>% 
+  mutate(ads_gmv_contrib = percent(total_ads_gmv/total_gmv, digits = 1)
+         , roas = total_ads_gmv/total_ads_spent
+         , gmv_per_livestream = total_gmv/no_livestreams)
+
+knitr::kable(sum_lv
+             , digits = 0
+             , caption = "Livestream Summary"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+
+```

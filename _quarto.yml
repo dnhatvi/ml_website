@@ -13,7 +13,7 @@ website:
     collapse-below: lg
     left:
       - text: "Project Proposal"
-        href: index.qmd
+        href: project_proposal.qmd
       - text: "Insights"
         href: insights.qmd
   sidebar:
@@ -22,16 +22,13 @@ website:
     search: true
     collapse-level: 1
     contents:
-      - section: "Competitor Overview"
+      - section: "Market Overview"
         contents:
-          - posts/ANALYSIS/market_overview.qmd
-      - section: "Baseline"
+          - posts/ANALYSIS/Market_Overview.qmd
+      - section: "Historical Performance"
         contents:
-          - posts/overview-analysis/index.qmd
-      - section: "Test"
-        contents:
-          - posts/post-with-code/index.qmd
-          - posts/welcome/index.qmd
+          - posts/ANALYSIS/Overview_Performance_H22023.qmd
+          - posts/ANALYSIS/Creator_Performance_H22023.qmd
   page-footer: 
     left: "Copyright 2024, Vi Duong" 
 
@@ -40,7 +37,7 @@ format:
   html:
     toc: true
     theme:
-      light: [lux, theme.scss]
+      light: [Yeti, theme.scss]
     code-copy: true
     code-overflow: wrap
     css: styles.css
