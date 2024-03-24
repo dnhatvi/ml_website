@@ -1,0 +1,484 @@
+---
+title: "Market Overview"
+author: "Vi Duong"
+date: "2024-03-20"
+format:
+  html:
+    embed-resources: false
+    toc: true
+    number-sections: true
+    theme: Yeti
+    fontsize: 1.1em
+    linestretch: 1.7
+---
+
+```{r}
+#| echo: false
+#| include: false
+
+library(pacman)
+p_load(dplyr
+       , readxl
+       , janitor
+       , lubridate
+       , stringr
+       , DT
+       , purrr
+       , highcharter
+       , tidyr
+       , reactable
+       , tibble
+       , networkD3
+       , RDataOps
+       , sf
+       , knitr
+       , htmltools
+       , leaflet
+       , plotly
+       , googlesheets4
+       , kableExtra
+       , formattable
+       , cohorts
+       , openxlsx
+       , RColorBrewer)
+
+source("../source_functions.R")
+
+# Color
+pink <- "#D81159"
+lightpink <- "#FF6893"
+lightgreen <- "#60BAAF"
+green <- "#00524A"
+
+
+```
+
+```{r, include=FALSE}
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/gmv_nmv.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/competitor_data_2023.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/competitor_data_2022_2023.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/competitor_shopee_cate.Rdata")
+load("../../../../[02] Ads Optimization/DATA/[02] Clean Data/competitor_tiktok_cate.Rdata")
+
+tiktok_rev <- ReadExcelFiles("../../../../[02] Ads Optimization/DATA/[00] Raw Data/tiktok_last6months_gmv.xlsx")
+
+link <- "https://docs.google.com/spreadsheets/d/1uuw0D6UYpjpZMLAOPfkzJM-8MoP4yKujC0iaE1rQkRE/edit#gid=0"
+
+```
+
+```{r, include=FALSE}
+gmv_nmv <- gmv_nmv %>%
+  mutate(est_gmv = case_when(gmv <= nmv ~ nmv * (1+0.53)
+                             , TRUE ~ gmv)) %>% 
+  filter(est_gmv > 0) %>% 
+  mutate(creator_type = ifelse(is.na(creator_type), "partner", creator_type)) %>% 
+  mutate(category = case_when(category %in% c("Womenswear", "womenswear") ~ "Trang phục nữ & Đồ lót"
+                              , category %in% c("Menswear") ~ "Trang phục nam & Đồ lót"
+                              , category %in% c("Beauty & personalcare") ~ "Chăm sóc sắc đẹp & Chăm sóc cá nhân"
+                              , category %in% c("Household Appliances", "Home Suppliers") ~ "Đồ gia dụng"
+                              # , category %in% c("Home Suppliers") ~ "Sửa chữa nhà cửa"
+                              , category %in% c("Fashion Accessories") ~ "Phụ kiện thời trang"
+                              , category %in% c("Shoes", "shoes") ~ "Giày"
+                              , category %in% c("Kitchenswear") ~ "Đồ dùng nhà bếp"
+                              , category %in% c("Health") ~ "Sức khỏe"
+                              , category %in% c("Luggage & Bags","luggage and bags") ~ "Hành lý & Túi xách"
+                              , category %in% c("Mom&baby") ~ "Trẻ sơ sinh & thai sản"
+                              , category %in% c("Accessories") ~ "Phụ kiện trang sức & Phái sinh"
+                              , category %in% c("Phone & Electronic") ~ "Điện thoại & Đồ điện tử"
+                              , category %in% c("f&B", "F&B") ~ "Đồ ăn & Đồ uống"
+                              , category %in% c("Grocery") ~ "Đồ ăn & Đồ uống"
+                              , TRUE ~ "Unknown"))
+```
+
+<h5><small>Assumption and Data Sources</h5>
+
+-   Assumption: Revenue is Gross Merchandise Value (GMV).
+-   Currency Unit: billion VND (bil VND)
+-   Data Source: Data for competitors including TikTok, Shopee, Lazada, Sendo, and Tiki was obtained through Metric.vn's web scraping tool. MeLive's data was provided directly by the MeLive team in a file named "gmv_nmv".</small>
+
+# Executive Summary
+
+<b>MeLive in the Evolving E-commerce Landscape</b>
+
+**Market Overview:**
+
+-   Vietnam's e-commerce market witnessed explosive growth in 2023, surging 78% to 225 trillion VND (9.2 billion USD).
+-   Shopee remains the leader but saw a 3% market share decline despite a 68% growth.
+-   TikTok Shop experienced a meteoric rise (1355% growth), capturing significant market share (16%) primarily from Lazada and Tiki.
+-   Live streaming, popularized by TikTok Shop, is becoming a crucial battleground for e-commerce platforms.
+-   Fashion and Health & Beauty are dominant categories on Shopee, contributing a combined 66%.
+
+**MeLive Performance:**
+
+-   In H2 2023, MeLive generated 433 billion VND, representing <b><u>2.1% of TikTok's revenue.</u></b> MeLive's contribution fluctuated but exhibited strong recovery in Q4, achieving double-digit MoM growth against TikTok's decline.
+-   MeLive currently holds a roughly <b><u>0.33% share of the total e-commerce market</u></b>.
+
+**Key Category Insights:**
+
+-   Beauty & Personal Care: Dominant on both platforms, but significantly higher (46%) on MeLive compared to TikTok (18.1%).
+-   Womenswear: Presents a significant growth opportunity for MeLive, with low contribution (2.4%) despite strong presence on TikTok (20%).
+-   Expansion Potential: Categories like Baby, Food & Beverage, and Sport & Outdoors offer promising avenues for MeLive to diversify its portfolio.
+
+**Recommendations:**
+
+-   Leverage MeLive's strong performance in Q4 to maintain momentum and capture a larger share of TikTok's growing e-commerce market.
+-   Capitalize on the opportunity in Womenswear by attracting sellers and promoting the category.
+-   Explore expansion into high-growth categories like Baby, Food & Beverage, and Sport & Outdoors to diversify MeLive's offerings and address consumer demand.
+
+# Total Revenue
+
+In 2023, total e-commerce sales surged from approximately 127 trillion VND to around 225 trillion VND, marking a remarkable 78% increase. This translates to a growth from 5.2 billion USD to 9.2 billion USD.
+
+Notably, Shopee contributed significantly with a 69% increase, while Tik Tok Shop experienced an extraordinary growth of 1355%.
+
+```{r}
+#| echo: false
+#| warning: false
+
+total_revenue_2022_2023_tb <- competitor_data_2022_2023 %>% 
+  group_by(year, platform) %>% 
+  summarise(revenue_bil_vnd = sum(revenue_bil_vnd)) %>% 
+  ungroup() %>% 
+  spread(year, revenue_bil_vnd) %>% 
+  adorn_totals() %>% 
+  mutate(`2023_vs_2022` = percent(`2023`/`2022`-1, digits = 1))
+
+knitr::kable(total_revenue_2022_2023_tb
+             , digits = 0
+             , caption = "VN Ecommerce Revenue And Growth Rate (bil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+total_revenue_2022_2023 <- competitor_data_2022_2023 %>% 
+  group_by(year, platform) %>% 
+  summarise(revenue_bil_vnd = sum(revenue_bil_vnd)) %>% 
+  ungroup() %>% 
+  mutate(color = case_when(platform == "Shopee" ~ "#ff6d01"
+                           , platform == "Tiktok" ~ "#000000"
+                           , platform == "Lazada" ~ "#0000ff"
+                           , platform == "Tiki" ~ "#4285f4"
+                           , platform == "Sendo" ~ "#ea4335"))
+
+CreateGroupedColumnChart(total_revenue_2022_2023
+                         , colX = year
+                         , colY = revenue_bil_vnd
+                         , groupCol = platform
+                         , colYTitle = "Revenue (bil VND)") %>%
+  hc_colors(total_revenue_2022_2023$color)
+```
+
+# Market Share
+
+While Shopee achieved a respectable 68% year-over-year growth, they experienced a 3% decline in market share. In contrast, TikTok Shop captured significant market share, jumping from 2% in 2022 to 16% in 2023. This impressive rise primarily came from Lazada's market share reduction (from 21% to 15%) and Tiki's significant drop (from 4.5% to 1.1%).
+
+Notably, TikTok Shop's livestream-based, entertainment-driven approach has compelled Shopee to invest heavily in live streaming functionality to remain competitive.
+
+```{r}
+#| echo: false
+#| warning: false
+
+market_share_2022 <- total_revenue_2022_2023 %>% 
+  filter(year =="2022") %>% 
+  arrange(desc(revenue_bil_vnd)) %>% 
+  mutate(color = case_when(platform == "Shopee" ~ "#ff6d01"
+                           , platform == "Tiktok" ~ "#000000"
+                           , platform == "Lazada" ~ "#0000ff"
+                           , platform == "Tiki" ~ "#4285f4"
+                           , platform == "Sendo" ~ "#ea4335"))
+
+CreatePieChart(data = market_share_2022
+               , colX = platform
+               , colY = revenue_bil_vnd) %>% 
+  hc_colors(market_share_2022$color) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %'))) %>%
+  hc_title(text = "VN Market Share 2022")
+
+market_share_2023 <- total_revenue_2022_2023 %>% 
+  filter(year =="2023") %>% 
+  arrange(desc(revenue_bil_vnd)) %>% 
+  mutate(color = case_when(platform == "Shopee" ~ "#ff6d01"
+                           , platform == "Tiktok" ~ "#000000"
+                           , platform == "Lazada" ~ "#0000ff"
+                           , platform == "Tiki" ~ "#4285f4"
+                           , platform == "Sendo" ~ "#ea4335"))
+
+CreatePieChart(data = market_share_2023
+               , colX = platform
+               , colY = revenue_bil_vnd) %>% 
+  hc_colors(market_share_2023$color) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %'))) %>%
+   hc_title(text = "VN Market Share 2023")
+
+```
+
+# Monthly Revenue In 2023
+
+```{r}
+#| echo: false
+#| warning: false
+
+# Define colors for each category
+# category_colors <- list("Shopee" = "#ff6d01"
+#                      , "Tiktok" = "#000000"
+#                      , "Lazada" = "#0000ff"
+#                      , "Tiki" = "#4285f4"
+#                      , "Sendo" = "#ea4335"
+#                      , "MeLive" = "#dc1a5d")
+
+monthly_revenue <- competitor_data_2023 %>% 
+  group_by(month, platform) %>% 
+  summarise(revenue_bil_vnd = sum(revenue_bil_vnd)) %>% 
+  ungroup()
+
+full_month <- monthly_revenue %>% 
+  select(month) %>% 
+  distinct()
+
+melive_revenue <- gmv_nmv %>% 
+  group_by(month) %>% 
+  summarise(revenue_bil_vnd = sum(est_gmv)/10^9) %>% 
+  ungroup() %>% 
+  right_join(full_month) %>% 
+  mutate(platform = "MeLive") %>% 
+  mutate_if(is.numeric, replace_na, 0)
+
+monthly_revenue <- monthly_revenue %>% 
+  bind_rows(melive_revenue) %>%
+  mutate(month = as.Date(month, format = "%Y-%m")) %>% 
+  arrange(month, platform) %>% 
+  mutate(color = case_when(platform == "Shopee" ~ "#ff6d01"
+                           , platform == "Tiktok" ~ "#000000"
+                           , platform == "Lazada" ~ "#0000ff"
+                           , platform == "Tiki" ~ "#4285f4"
+                           , platform == "Sendo" ~ "#ea4335"
+                           , platform == "MeLive" ~ "#dc1a5d"))
+
+chart <- monthly_revenue %>%
+    hchart(
+      'line', hcaes(x = month, y = revenue_bil_vnd, group = platform)
+    ) %>%
+    hc_yAxis(title = list(text = "Revenue (bil VND)")) %>%
+    hc_colors(colors = monthly_revenue$color) %>%
+    FormatTooltip(valueDecimal = 0)
+
+chart
+
+```
+
+# Categories
+
+## Shopee
+
+Fashion and Health & Beauty remain the dominant categories on Shopee, comprising 47% of sales.
+
+```{r}
+#| echo: false
+#| warning: false
+
+shopee_cate <- competitor_shopee_cate %>%
+  mutate(percent = revenue_bil_vnd/sum(revenue_bil_vnd)) %>% 
+  adorn_totals() %>% 
+  mutate(percent = percent(percent, digits = 1))
+
+knitr::kable(shopee_cate
+             , digits = 0
+             , caption = "Shopee Categories Revenue And Contribution (bil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+CreateColumnChart(shopee_cate %>% filter(categories != "Total")
+                  , colY = revenue_bil_vnd
+                  , colX = categories
+                  , colYTitle = "Revenue (bil VND)") %>% 
+  hc_colors("#ff6d01")
+
+
+CreatePieChart(shopee_cate %>% filter(categories != "Total")
+                  , colY = revenue_bil_vnd
+                  , colX = categories) %>% 
+  hc_colors(brewer.pal(length(shopee_cate$categories), 'Spectral')) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %'))) %>%
+   hc_title(text = "Shopee Categories Contribution 2023")
+
+```
+
+## Tiktok
+
+Contribution of Fashion & Health - Beauty is critical with 66% contribution
+
+```{r}
+#| echo: false
+#| warning: false
+
+tiktok_cate <- competitor_tiktok_cate %>%
+  mutate(percent = revenue_bil_vnd/sum(revenue_bil_vnd)) %>% 
+  adorn_totals() %>% 
+  mutate(percent = percent(percent, digits = 1))
+
+knitr::kable(tiktok_cate
+             , digits = 0
+             , caption = "Tiktok Categories Revenue And Contribution (bil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+
+CreateColumnChart(tiktok_cate %>% filter(categories != "Total")
+                  , colY = revenue_bil_vnd
+                  , colX = categories
+                  , colYTitle = "Revenue (bil VND)") %>% 
+  hc_colors("#000000")
+
+
+CreatePieChart(tiktok_cate %>% filter(categories != "Total")
+                  , colY = revenue_bil_vnd
+                  , colX = categories) %>% 
+  hc_colors(brewer.pal(length(tiktok_cate$categories), 'Spectral')) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %'))) %>%
+   hc_title(text = "Tiktok Categories Contribution 2023")
+
+```
+
+# Melive Vs. Tiktok
+
+## Total revenue in 6 months
+
+-   In the second half of 2023, MeLive generated approximately 433 billion VND, representing 2.1% of TikTok's total revenue. MeLive's contribution then fluctuated, reaching a low of 1.4% in July before recovering to 4.3% by December 2023.
+
+-   During the peak e-commerce season in Q4 2023, MeLive achieved impressive double-digit month-over-month growth, contrasting with TikTok's double-digit decline in revenue share.
+
+::: callout-note
+Position Of MeLive in the Ecommerce Market: While MeLive contributes 2.1% to TikTok's e-commerce market share, which holds 15.8% of the total market, MeLive's overall contribution to the total e-commerce market is roughly 0.33%.
+:::
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+melive_revenue <- gmv_nmv %>% 
+  group_by(month) %>% 
+  summarise(revenue_bil_vnd = sum(est_gmv)/10^9) %>% 
+  ungroup() %>% 
+  mutate(platform = "MeLive") %>% 
+  mutate_if(is.numeric, replace_na, 0)
+
+
+tiktok_monthly_revenue <- competitor_data_2023 %>%
+  filter(platform == "Tiktok") %>% 
+  group_by(month, platform) %>% 
+  summarise(revenue_bil_vnd = sum(revenue_bil_vnd)) %>% 
+  ungroup() %>% 
+  filter(month >= min(melive_revenue$month))
+
+tiktok_monthly_revenue <- tiktok_monthly_revenue %>% 
+  bind_rows(melive_revenue) %>%
+  mutate(month = as.Date(month, format = "%Y-%m")) %>% 
+  arrange(month, desc(revenue_bil_vnd))
+
+tiktok_monthly_revenue_tb <- tiktok_monthly_revenue %>% 
+  spread(platform, revenue_bil_vnd) %>% 
+  mutate(MeLive_MoM = MeLive/lag(MeLive)-1
+         , Tiktok_MoM = Tiktok/lag(Tiktok) -1) %>% 
+  select(month, contains('MeLive'), contains('Tiktok')) %>%
+  adorn_totals() %>%
+  mutate(MeLive_MoM = ifelse(month == "Total", NA_real_, MeLive_MoM)
+         , Tiktok_MoM = ifelse(month == "Total", NA_real_, Tiktok_MoM)) %>% 
+  mutate(MeLive_vs_Tiktok = percent(MeLive/Tiktok, digits = 1)) %>% 
+  mutate_at(vars("MeLive_MoM", "Tiktok_MoM"), percent, digits = 1)
+
+knitr::kable(tiktok_monthly_revenue_tb
+             , digits = 0
+             , caption = "MeLive Vs Tiktok Revenue And Growth Rate (bil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = "striped")
+
+chart <- tiktok_monthly_revenue %>%
+    hchart(
+      'line', hcaes(x = month, y = revenue_bil_vnd, group = platform)
+    ) %>%
+    hc_yAxis(title = list(text = "Revenue (bil VND)")) %>%
+    hc_colors(colors = c("#dc1a5d", "#000000")) %>%
+    FormatTooltip(valueDecimal = 0)
+
+chart
+```
+
+## Contribution By Categories
+
+<i>Data Source Note:
+
+-   TikTok: Revenue by category data comes from Metric.vn. They have cleaned and mapped TikTok categories using Shopee's benchmarks, potentially leading to some inconsistencies.
+-   MeLive: Category information comes directly from the MeLive team. This data might be biased due to seller classifications and their primary categories, as sellers can offer products across various categories.
+
+Recommendation:
+
+-   Consider this data a valuable reference, but be aware of potential biases for a more accurate understanding.</i>
+
+Key Takeaways:
+
+-   Beauty & Personal Care: Dominates both platforms, but with a significant difference. It represents 18.1% of TikTok's categories compared to a much higher 46% in MeLive.
+-   Womenswear: Presents a growth opportunity for MeLive. While contributing 20% on TikTok, it only accounts for 2.4% of MeLive's categories.
+-   Expansion Potential: Categories like Baby, Food & Beverage, and Sport & Outdoors offer promising avenues for MeLive to expand its portfolio.
+
+```{r}
+#| echo: false
+#| warning: false
+
+summary_category <- gmv_nmv %>% 
+  group_by(category) %>% 
+  summarise(melive = sum(nmv)/10^9) %>% 
+  ungroup() %>% 
+  arrange(desc(melive)) %>% 
+  full_join(tiktok_rev) %>%
+  rename(tiktok = revenue_bil_vnd) %>% 
+  mutate_if(is.numeric, replace_na, 0) %>% 
+  mutate(percent_ml = percent(melive/sum(melive), digits = 1)) %>% 
+  mutate(percent_tiktok = percent(tiktok/sum(tiktok), digits = 1)) %>%
+  adorn_totals() %>% 
+  mutate(ml_share_in_tiktok = percent(melive/tiktok, digits = 2))
+
+knitr::kable(summary_category
+             , digits = 0
+             , caption = "GMV By Category vs Tiktok Shop (bil VND)"
+             , format.args = list(big.mark = ",", scientific = FALSE)
+             , "simple")
+
+CreatePieChart(data = summary_category %>% filter(category != "Total")
+               , colX = category
+               , colY = melive) %>% 
+  hc_title(text = "Melive Revenue Contribution By Category") %>% 
+  hc_colors(brewer.pal(length(unique(tiktok_rev$category)), 'Spectral')) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %')))
+
+CreatePieChart(data = summary_category %>% filter(category != "Total")
+               , colX = category
+               , colY = tiktok) %>% 
+  hc_title(text = "Tiktok Revenue Contribution By Category") %>% 
+  hc_colors(brewer.pal(length(unique(tiktok_rev$category)), 'Spectral')) %>% 
+  hc_plotOptions(pie = list(
+    dataLabels = list(
+      enabled = TRUE,
+      format = '{point.name}: {point.percentage:.1f} %')))
+
+
+```

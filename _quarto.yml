@@ -5,6 +5,7 @@ website:
   title: "MeLive"
   image: "melive_logo.png"
   page-navigation: true
+  open-graph: true
   navbar:
     background: white
     logo: melive_logo.png
